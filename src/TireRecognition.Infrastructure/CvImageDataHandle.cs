@@ -5,7 +5,7 @@ namespace TireRecognition.Infrastructure;
 
 public class CvImageDataHandle : ImageDataHandle, IDisposable
 {
-    public override ImageDimensions Dimensions => new() { Width = Data.Cols, Height = Data.Rows };
+    public override ImageDimensions Dimensions => new(Width: Data.Cols, Height: Data.Rows);
     public override byte[] Bytes => Data.ToBytes();
     public Mat Data { get; }
 
