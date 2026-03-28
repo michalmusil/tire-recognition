@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireRecognition.Domain", "TireRecognition.Domain\TireRecognition.Domain.csproj", "{09E9256D-504F-4617-B914-CC5688EECE76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireRecognition.Application", "TireRecognition.Application\TireRecognition.Application.csproj", "{91C345D3-2EBA-4C5E-BA65-DDCC579C4C14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireRecognition.Infrastructure", "TireRecognition.Infrastructure\TireRecognition.Infrastructure.csproj", "{E948A497-6F80-4BE9-84D4-7E821CE1CEF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireRecognition.Shared", "TireRecognition.Shared\TireRecognition.Shared.csproj", "{4D315C3D-33E1-4B93-B418-785E5C60EB0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireRecognition.WebApi", "TireRecognition.WebApi\TireRecognition.WebApi.csproj", "{B5579502-7DA1-4DC0-90D0-DDF9FF647690}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09E9256D-504F-4617-B914-CC5688EECE76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09E9256D-504F-4617-B914-CC5688EECE76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09E9256D-504F-4617-B914-CC5688EECE76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09E9256D-504F-4617-B914-CC5688EECE76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91C345D3-2EBA-4C5E-BA65-DDCC579C4C14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91C345D3-2EBA-4C5E-BA65-DDCC579C4C14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91C345D3-2EBA-4C5E-BA65-DDCC579C4C14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91C345D3-2EBA-4C5E-BA65-DDCC579C4C14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E948A497-6F80-4BE9-84D4-7E821CE1CEF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E948A497-6F80-4BE9-84D4-7E821CE1CEF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E948A497-6F80-4BE9-84D4-7E821CE1CEF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E948A497-6F80-4BE9-84D4-7E821CE1CEF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D315C3D-33E1-4B93-B418-785E5C60EB0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D315C3D-33E1-4B93-B418-785E5C60EB0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D315C3D-33E1-4B93-B418-785E5C60EB0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D315C3D-33E1-4B93-B418-785E5C60EB0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5579502-7DA1-4DC0-90D0-DDF9FF647690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5579502-7DA1-4DC0-90D0-DDF9FF647690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5579502-7DA1-4DC0-90D0-DDF9FF647690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5579502-7DA1-4DC0-90D0-DDF9FF647690}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
