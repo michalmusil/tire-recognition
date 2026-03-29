@@ -32,4 +32,14 @@
         <PackageReference Include="YoloDotNet.ExecutionProvider.Cpu" Version="1.1.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Models\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Models\tire_segmentation_v5.onnx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
