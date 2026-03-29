@@ -3,26 +3,18 @@ using TireRecognition.Domain.Preprocessing;
 
 namespace TireRecognition.Infrastructure;
 
-public class CvImageDataHandle : ImageDataHandle, IDisposable
+public class CvImageDataHandle : ImageDataHandle
 {
     public override ImageDimensions Dimensions => new(Width: Data.Cols, Height: Data.Rows);
-    public override byte[] Bytes => GetInternalDataBytes();
-    public Mat Data { get; }
-    private byte[]? _bytes = null;
+    public override byte[] Bytes => Data.ToBytes();
+    public Mat Data { get; set; }
 
     public CvImageDataHandle(Mat data)
     {
         Data = data;
     }
 
-    public void Dispose()
-    {
-        Data.Dispose();
-    }
+    public override ImageDataHandle Clone() => new CvImageDataHandle(Data.Clone());
 
-    private byte[] GetInternalDataBytes()
-    {
-        _bytes ??= Data.ToBytes();
-        return _bytes;
-    }
+    public override void Dispose() => Data.Dispose();
 }
