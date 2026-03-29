@@ -27,6 +27,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IContentTypeResolverService, ContentTypeResolverService>();
         services.AddScoped<IImageManipulationService, CvImageManipulationService>();
+        services.AddScoped<IRecognitionService, GeminiRecognitionService>();
     }
 
     private static void AddFacades(IServiceCollection services)
