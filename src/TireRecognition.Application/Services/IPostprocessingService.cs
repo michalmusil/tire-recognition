@@ -1,4 +1,4 @@
-using TireRecognition.Domain;
+using TireRecognition.Domain.Postprocessing;
 
 namespace TireRecognition.Application.Services;
 

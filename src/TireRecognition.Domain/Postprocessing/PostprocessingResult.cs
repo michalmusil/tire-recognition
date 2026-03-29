@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace TireRecognition.Domain;
+namespace TireRecognition.Domain.Postprocessing;
 
 public class PostprocessingResult
 {

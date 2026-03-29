@@ -1,4 +1,4 @@
-namespace TireRecognition.Domain;
+namespace TireRecognition.Domain.Preprocessing;
 
 public abstract class ImageDataHandle
 {

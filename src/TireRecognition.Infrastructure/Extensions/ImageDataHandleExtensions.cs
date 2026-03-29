@@ -1,4 +1,4 @@
-using TireRecognition.Domain;
+using TireRecognition.Domain.Preprocessing;
 using TireRecognition.Infrastructure.Exceptions;
 
 namespace TireRecognition.Infrastructure.Extensions;

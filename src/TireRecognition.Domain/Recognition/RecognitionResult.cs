@@ -1,4 +1,4 @@
-namespace TireRecognition.Domain;
+namespace TireRecognition.Domain.Recognition;
 
 public record RecognitionResult(
     string? RecognizedTireCode,

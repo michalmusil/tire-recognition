@@ -1,5 +1,5 @@
 using OpenCvSharp;
-using TireRecognition.Domain;
+using TireRecognition.Domain.Preprocessing;
 
 namespace TireRecognition.Infrastructure;
 
