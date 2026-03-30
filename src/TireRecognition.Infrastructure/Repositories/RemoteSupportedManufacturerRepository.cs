@@ -29,23 +29,22 @@ public class RemoteSupportedManufacturerRepository : ISupportedManufacturerRepos
     {
         try
         {
-            var key = _httpClient.BaseAddress?.AbsoluteUri ?? "";
-            if (_responseCache.TryGetValue(key, out IEnumerable<string>? result))
+            var uri = _options.TireManufacturerEndpointUri;
+            if (_responseCache.TryGetValue(uri, out IEnumerable<string>? result))
                 return result!;
 
-            var res = await _httpClient.GetAsync("");
+            var res = await _httpClient.GetAsync(uri);
             if (!res.IsSuccessStatusCode)
             {
                 _logger.LogError($"Failed to access remote manufacturer db matching API: {res.StatusCode}");
-                throw new RemoteDbMatchingNotAccessible(_httpClient.BaseAddress?.AbsoluteUri ?? "",
-                    (int)res.StatusCode);
+                throw new RemoteDbMatchingNotAccessible(uri, (int)res.StatusCode);
             }
 
             var manufacturerNames = await res.Content.ReadFromJsonAsync<List<string>>();
             if (manufacturerNames is null)
                 throw new JsonException("Failed to parse remote manufacturer db response");
-            
-            _responseCache.Set(key, manufacturerNames, GetCacheEntryDuration());
+
+            _responseCache.Set(uri, manufacturerNames, GetCacheEntryDuration());
             return manufacturerNames;
         }
         catch (Exception ex)

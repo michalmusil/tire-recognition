@@ -31,16 +31,15 @@ public class RemoteSupportedTireEntryRepository : ISupportedTireEntryRepository
     {
         try
         {
-            var key = _httpClient.BaseAddress?.AbsoluteUri ?? "";
-            if (_responseCache.TryGetValue(key, out IEnumerable<TireDbEntry>? result))
+            var uri = _options.TireCodeEndpointUri;
+            if (_responseCache.TryGetValue(uri, out IEnumerable<TireDbEntry>? result))
                 return result!;
 
-            var res = await _httpClient.GetAsync("");
+            var res = await _httpClient.GetAsync(uri);
             if (!res.IsSuccessStatusCode)
             {
                 _logger.LogError($"Failed to access remote tire code db matching API: {res.StatusCode}");
-                throw new RemoteDbMatchingNotAccessible(_httpClient.BaseAddress?.AbsoluteUri ?? "",
-                    (int)res.StatusCode);
+                throw new RemoteDbMatchingNotAccessible(uri, (int)res.StatusCode);
             }
 
             var rawDbEntries = await res.Content.ReadFromJsonAsync<List<RawTireDbEntryDto>>();
@@ -51,7 +50,7 @@ public class RemoteSupportedTireEntryRepository : ISupportedTireEntryRepository
                 .Select(raw => raw.ToDomain())
                 .ToList();
 
-            _responseCache.Set(key, dbEntries, GetCacheEntryDuration());
+            _responseCache.Set(uri, dbEntries, GetCacheEntryDuration());
             return dbEntries;
         }
         catch (Exception ex)

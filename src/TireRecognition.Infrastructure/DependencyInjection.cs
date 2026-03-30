@@ -54,25 +54,18 @@ public static class DependencyInjection
     {
         services.AddMemoryCache();
 
-        services.AddHttpClient<ISupportedTireEntryRepository, RemoteSupportedTireEntryRepository>((sp, client) =>
-        {
-            var dbMatchingOptions = sp.GetRequiredService<IOptions<TireDbMatchingOptions>>().Value;
-            client.BaseAddress = new Uri(dbMatchingOptions.TireCodeEndpointUri);
-        });
-        services.AddHttpClient<ISupportedManufacturerRepository, RemoteSupportedManufacturerRepository>((sp, client) =>
-        {
-            var dbMatchingOptions = sp.GetRequiredService<IOptions<TireDbMatchingOptions>>().Value;
-            client.BaseAddress = new Uri(dbMatchingOptions.TireManufacturerEndpointUri);
-        });
+        services.AddHttpClient<ISupportedTireEntryRepository, RemoteSupportedTireEntryRepository>();
+        services.AddHttpClient<ISupportedManufacturerRepository, RemoteSupportedManufacturerRepository>();
     }
 
     private static void AddServices(IServiceCollection services)
     {
         services.AddScoped<IContentTypeResolverService, ContentTypeResolverService>();
         services.AddScoped<IImageManipulationService, CvImageManipulationService>();
-        services.AddScoped<IRecognitionService, GeminiRecognitionService>();
         services.AddScoped<ITireRimExtractionService, TireRimExtractionService>();
         services.AddScoped<IPostprocessingService, PostprocessingService>();
         services.AddScoped<IDbMatchingService, DbMatchingService>();
+
+        services.AddHttpClient<IRecognitionService, GeminiRecognitionService>();
     }
 }
