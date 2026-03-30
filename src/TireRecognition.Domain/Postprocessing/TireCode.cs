@@ -2,24 +2,23 @@ using System.Text;
 
 namespace TireRecognition.Domain.Postprocessing;
 
-public class PostprocessingResult
+public class TireCode
 {
-    public required string RawCode { get; init; }
+    public required string RawCode { get; set; }
+    public decimal? Width { get; set; }
+    public decimal? AspectRatio { get; set; }
+    public string? DeprecatedSpeedRating { get; set; }
+    public string? Construction { get; set; }
+    public decimal? Diameter { get; set; }
 
-    public decimal? Width { get; init; }
-    public decimal? AspectRatio { get; init; }
-    public string? DeprecatedSpeedRating { get; init; }
-    public string? Construction { get; init; }
-    public decimal? Diameter { get; init; }
-
-    public char? LoadRange { get; init; }
+    public char? LoadRange { get; set; }
 
     // The only load index for passenger cars, single-mount tire load index for Light Trucks
-    public int? LoadIndex { get; init; }
+    public int? LoadIndex { get; set; }
 
     // Dual mount tire load index. Only present on light truck tires.
-    public int? LoadIndex2 { get; init; }
-    public string? SpeedRating { get; init; }
+    public int? LoadIndex2 { get; set; }
+    public string? SpeedRating { get; set; }
 
     public bool WasProcessedSuccessfully => Width is not null || AspectRatio is not null ||
                                             Construction is not null || Diameter is not null || LoadRange is not null ||

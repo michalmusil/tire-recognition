@@ -4,5 +4,6 @@ namespace TireRecognition.Application.Services;
 
 public interface IPostprocessingService
 {
-    public Task<PostprocessingResult> PostprocessTireCodeAsync(string rawTireCode);
+    public Task<IEnumerable<TireCode>> ExtractStructuredTireCodesAsync(string rawTireCode);
+    public TireCode? PickBestTireCode(IEnumerable<TireCode> tireCodes);
 }

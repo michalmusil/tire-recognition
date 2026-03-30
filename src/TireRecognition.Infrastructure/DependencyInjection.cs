@@ -54,6 +54,7 @@ public static class DependencyInjection
         services.AddScoped<IImageManipulationService, CvImageManipulationService>();
         services.AddScoped<IRecognitionService, GeminiRecognitionService>();
         services.AddScoped<ITireRimExtractionService, TireRimExtractionService>();
+        services.AddScoped<IPostprocessingService, PostprocessingService>();
     }
 
     private static void AddFacades(IServiceCollection services)
