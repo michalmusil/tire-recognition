@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using TireRecognition.Application.Services;
 using TireRecognition.Domain.Postprocessing;
 
@@ -6,18 +7,35 @@ namespace TireRecognition.Infrastructure.Services;
 
 public class PostprocessingService : IPostprocessingService
 {
+    private readonly ILogger<PostprocessingService> _logger;
+
+    public PostprocessingService(ILogger<PostprocessingService> logger)
+    {
+        _logger = logger;
+    }
+
     public async Task<IEnumerable<TireCode>> ExtractStructuredTireCodesAsync(string rawTireCode)
     {
+        _logger.LogInformation($"Starting postprocessing extraction for raw tire code: '{rawTireCode}'");
         var cleanedUpTireCode = PerformPreMatchingCleanup(rawTireCode);
         var anchors = GetTireCodeAnchorsFromRawString(cleanedUpTireCode).ToList();
 
         if (!anchors.Any())
+        {
+            _logger.LogInformation($"No anchors detected for tire code: '{cleanedUpTireCode}'");
             return [];
+        }
 
-        var validTireCodes = anchors
+        var tireCodes = anchors
             .Select(a => ProcessPotentialTireCode(a, cleanedUpTireCode))
+            .ToList();
+        _logger.LogInformation($"Found {tireCodes.Count} potential tire codes in '{cleanedUpTireCode}'");
+
+        var validTireCodes = tireCodes
             .Where(tc => tc.IsValidForReturn)
             .ToList();
+
+        _logger.LogInformation($"Found {validTireCodes.Count} valid tire codes in '{cleanedUpTireCode}'");
 
         return validTireCodes;
     }
@@ -27,12 +45,15 @@ public class PostprocessingService : IPostprocessingService
         var tireCodeList = tireCodes.ToList();
         if (!tireCodeList.Any())
             return null;
+        _logger.LogInformation($"Started picking the best tire code from: '{string.Join(", ", tireCodeList)}'");
 
         var bestTireCode = tireCodeList
             .Select(tc => (tc, GetScoreOfTireCode(tc)))
             .OrderByDescending(x => x.Item2)
             .ThenByDescending(x => x.tc.GetProcessedCode().Length)
             .FirstOrDefault().tc;
+
+        _logger.LogInformation($"Finished picking the best tire code. Picked: '{bestTireCode}'");
 
         return bestTireCode;
     }

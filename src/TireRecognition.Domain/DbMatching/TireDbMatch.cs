@@ -1,7 +1,7 @@
 namespace TireRecognition.Domain.DbMatching;
 
 public record TireDbMatch(
-    ProcessedTireParamsDatabaseEntryDto TireEntry,
+    TireDbEntry TireEntry,
     int TotalRequiredCharEdits,
     int MatchedMainParameterCount,
     decimal EstimatedAccuracy,

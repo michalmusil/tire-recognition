@@ -1,6 +1,6 @@
 namespace TireRecognition.Domain.DbMatching;
 
-public class ProcessedTireParamsDatabaseEntryDto
+public class TireDbEntry
 {
     public decimal Width { get; init; }
     public decimal Diameter { get; init; }

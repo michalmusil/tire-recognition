@@ -2,8 +2,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SkiaSharp;
+using TireRecognition.Application.Repositories;
 using TireRecognition.Application.Services;
 using TireRecognition.Infrastructure.Options;
+using TireRecognition.Infrastructure.Repositories;
 using TireRecognition.Infrastructure.Services;
 using YoloDotNet;
 using YoloDotNet.Enums;
@@ -18,8 +20,8 @@ public static class DependencyInjection
     {
         AddOptions(services, configuration);
         AddMlModels(services);
+        AddRepositories(services, configuration);
         AddServices(services);
-        AddFacades(services);
         return services;
     }
 
@@ -48,6 +50,22 @@ public static class DependencyInjection
         });
     }
 
+    private static void AddRepositories(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddMemoryCache();
+
+        services.AddHttpClient<ISupportedTireEntryRepository, RemoteSupportedTireEntryRepository>((sp, client) =>
+        {
+            var dbMatchingOptions = sp.GetRequiredService<IOptions<TireDbMatchingOptions>>().Value;
+            client.BaseAddress = new Uri(dbMatchingOptions.TireCodeEndpointUri);
+        });
+        services.AddHttpClient<ISupportedManufacturerRepository, RemoteSupportedManufacturerRepository>((sp, client) =>
+        {
+            var dbMatchingOptions = sp.GetRequiredService<IOptions<TireDbMatchingOptions>>().Value;
+            client.BaseAddress = new Uri(dbMatchingOptions.TireManufacturerEndpointUri);
+        });
+    }
+
     private static void AddServices(IServiceCollection services)
     {
         services.AddScoped<IContentTypeResolverService, ContentTypeResolverService>();
@@ -55,9 +73,6 @@ public static class DependencyInjection
         services.AddScoped<IRecognitionService, GeminiRecognitionService>();
         services.AddScoped<ITireRimExtractionService, TireRimExtractionService>();
         services.AddScoped<IPostprocessingService, PostprocessingService>();
-    }
-
-    private static void AddFacades(IServiceCollection services)
-    {
+        services.AddScoped<IDbMatchingService, DbMatchingService>();
     }
 }

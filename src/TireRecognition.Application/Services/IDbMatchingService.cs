@@ -5,5 +5,6 @@ namespace TireRecognition.Application.Services;
 
 public interface IDbMatchingService
 {
-    public Task<DbMatchingResult> GetOrderedDbMatchesForTireCodeAsync(TireCode tireCode, int? limit);
+    public Task<List<TireDbMatch>> GetOrderedDbMatchesForTireCodeAsync(TireCode tireCode, int? limit);
+    public Task<string?> GetManufacturerNameDbMatch(string rawTireManufacturerName);
 }
