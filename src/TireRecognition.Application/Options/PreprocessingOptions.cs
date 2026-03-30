@@ -1,4 +1,4 @@
-namespace TireRecognition.Infrastructure.Options;
+namespace TireRecognition.Application.Options;
 
 public class PreprocessingOptions
 {
@@ -11,6 +11,11 @@ public class PreprocessingOptions
     /// Defines max side (width or height) of image before recognition begins. Images exceeding this value are scaled down to match it. 
     /// </summary>
     public int MaxOutputImageSize { get; set; }
+
+    /// <summary>
+    /// How many slices should the extracted tire strip be sliced into (with overlap). Slicing serves to remove influence of width-heavy extracted tire sidewall aspect rations.  
+    /// </summary>
+    public int NumberOfSlices { get; set; }
 
     /// <summary>
     /// A ratio by which the detected rim radius is multiplied to get the whole wheel (incl. tire) radius 

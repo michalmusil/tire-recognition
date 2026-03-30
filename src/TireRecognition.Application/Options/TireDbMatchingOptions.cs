@@ -1,4 +1,4 @@
-namespace TireRecognition.Infrastructure.Options;
+namespace TireRecognition.Application.Options;
 
 public class TireDbMatchingOptions
 {

@@ -1,8 +1,9 @@
 using TireRecognition.Domain.Preprocessing;
+using TireRecognition.Shared.Exceptions;
 
 namespace TireRecognition.Infrastructure.Exceptions;
 
 public class UnsupportedImageDataHandleException(Type unsupportedType)
-    : Exception($"Provided unsupported type of {nameof(ImageDataHandle)}: '{unsupportedType.Name}'")
+    : InternalErrorException($"Provided unsupported type of {nameof(ImageDataHandle)}: '{unsupportedType.Name}'")
 {
 }

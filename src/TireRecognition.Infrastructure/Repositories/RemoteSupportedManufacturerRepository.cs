@@ -3,9 +3,9 @@ using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TireRecognition.Application.Options;
 using TireRecognition.Application.Repositories;
 using TireRecognition.Infrastructure.Exceptions;
-using TireRecognition.Infrastructure.Options;
 
 namespace TireRecognition.Infrastructure.Repositories;
 
@@ -37,7 +37,7 @@ public class RemoteSupportedManufacturerRepository : ISupportedManufacturerRepos
             if (!res.IsSuccessStatusCode)
             {
                 _logger.LogError($"Failed to access remote manufacturer db matching API: {res.StatusCode}");
-                throw new RemoteDbMatchingNotAccessible(uri, (int)res.StatusCode);
+                throw new RemoteDbMatchingUnreachableException(uri, (int)res.StatusCode);
             }
 
             var manufacturerNames = await res.Content.ReadFromJsonAsync<List<string>>();

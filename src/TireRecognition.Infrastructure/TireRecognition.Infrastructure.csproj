@@ -19,10 +19,8 @@
     <ItemGroup>
         <PackageReference Include="Fastenshtein" Version="1.0.12"/>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.5" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.5" />
         <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108"/>
         <PackageReference Include="OpenCvSharp4.official.runtime.linux-x64" Version="4.10.0.20241108" Condition="'$(IsLinux)' == 'true'"/>
         <PackageReference Include="OpenCvSharp4.runtime.osx_arm64" Version="4.8.1-rc" Condition="'$(IsOSX)' == 'true'"/>

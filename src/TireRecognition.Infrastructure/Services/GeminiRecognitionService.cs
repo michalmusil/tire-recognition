@@ -2,11 +2,12 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TireRecognition.Application.Options;
 using TireRecognition.Application.Services;
 using TireRecognition.Domain.Preprocessing;
 using TireRecognition.Domain.Recognition;
 using TireRecognition.Infrastructure.Dtos.GeminiResponse;
-using TireRecognition.Infrastructure.Options;
+using TireRecognition.Infrastructure.Exceptions;
 
 namespace TireRecognition.Infrastructure.Services;
 
@@ -69,7 +70,7 @@ public class GeminiRecognitionService : IRecognitionService
         catch (Exception e)
         {
             _logger.LogError(e, $"Recognition via {nameof(GeminiRecognitionService)} failed.");
-            throw;
+            throw new RemoteRecognitionEngineFailed(nameof(GeminiRecognitionService));
         }
     }
 

@@ -2,10 +2,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenCvSharp;
 using SkiaSharp;
+using TireRecognition.Application.Options;
 using TireRecognition.Application.Services;
 using TireRecognition.Domain.Preprocessing;
 using TireRecognition.Infrastructure.Extensions;
-using TireRecognition.Infrastructure.Options;
 using YoloDotNet;
 using YoloDotNet.Models;
 
@@ -71,7 +71,7 @@ public class TireRimExtractionService : ITireRimExtractionService
             _logger.LogInformation("Tire rim detection failed: detected rim contour was not within image bounds");
             return null;
         }
-        
+
         _logger.LogInformation("Tire rim detection succeeded");
         return rimPosition;
     }
@@ -83,7 +83,7 @@ public class TireRimExtractionService : ITireRimExtractionService
         var croppedHeight = (int)(2 * Math.PI * inner);
 
         var cvHandle = image.ToCvDataHandle();
-        var fullPolar = new Mat();
+        using var fullPolar = new Mat();
 
         Cv2.WarpPolar(
             cvHandle.Data,
@@ -96,7 +96,7 @@ public class TireRimExtractionService : ITireRimExtractionService
         );
 
         var tireThickness = (int)(outer - inner);
-        using var croppedResult = new Mat(
+        var croppedResult = new Mat(
             fullPolar,
             new Rect(
                 location: new Point(X: (fullPolar.Width - tireThickness), Y: 0),

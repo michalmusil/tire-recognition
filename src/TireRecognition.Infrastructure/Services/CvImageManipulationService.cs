@@ -106,8 +106,8 @@ public class CvImageManipulationService : IImageManipulationService
         return new CvImageDataHandle(resultImage);
     }
 
-    public List<ImageDataHandle> SliceImage(ImageDataHandle image, ImageDimensions sliceDimensions, int xOverlap,
-        int yOverlap)
+    public List<ImageDataHandle> SliceImage(ImageDataHandle image, ImageDimensions sliceDimensions,
+        double xOverlapRatio, double yOverlapRatio)
     {
         var inputHandle = image.ToCvDataHandle();
         var height = inputHandle.Dimensions.Height;
@@ -116,8 +116,8 @@ public class CvImageManipulationService : IImageManipulationService
         var realSliceWidth = sliceDimensions.Width;
         var realSliceHeight = sliceDimensions.Height;
 
-        var overlapWidth = xOverlap * realSliceWidth;
-        var overlapHeight = yOverlap * realSliceHeight;
+        var overlapWidth = xOverlapRatio * realSliceWidth;
+        var overlapHeight = yOverlapRatio * realSliceHeight;
 
         var startingXs = GenerateRange(0, width, realSliceWidth);
         var startingYs = GenerateRange(0, height, realSliceHeight);

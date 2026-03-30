@@ -15,6 +15,6 @@ public interface IImageManipulationService
     public List<ImageDataHandle> SliceImage(
         ImageDataHandle image,
         ImageDimensions sliceDimensions,
-        int xOverlap,
-        int yOverlap);
+        double xOverlapRatio,
+        double yOverlapRatio);
 }
