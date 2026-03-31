@@ -26,4 +26,14 @@ public class RecognitionOptions
     /// Api key to the used VLM model  
     /// </summary>
     public string VlmApiKey { get; set; } = "";
+
+    /// <summary>
+    /// Price in USD per 1 million input tokens to use for cost estimation  
+    /// </summary>
+    public decimal InputTokenPricePerMillion { get; set; } = 0m;
+
+    /// <summary>
+    /// Price in USD per 1 million output tokens to use for cost estimation  
+    /// </summary>
+    public decimal OutputTokenPricePerMillion { get; set; } = 0m;
 }

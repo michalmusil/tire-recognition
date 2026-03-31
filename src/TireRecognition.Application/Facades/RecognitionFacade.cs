@@ -22,13 +22,15 @@ public class RecognitionFacade : IRecognitionFacade
     private readonly IDbMatchingService _dbMatchingService;
     private readonly PreprocessingOptions _preprocessingOptions;
     private readonly TireDbMatchingOptions _dbMatchingOptions;
+    private readonly ICostEstimationService _costEstimationService;
     private readonly ILogger<RecognitionFacade> _logger;
 
     public RecognitionFacade(IContentTypeResolverService contentTypeResolverService,
         IImageManipulationService imageManipulationService, ITireRimExtractionService tireRimExtractionService,
         IRecognitionService recognitionService, IPostprocessingService postprocessingService,
         IDbMatchingService dbMatchingService, IOptions<PreprocessingOptions> preprocessingOptions,
-        IOptions<TireDbMatchingOptions> dbMatchingOptions, ILogger<RecognitionFacade> logger)
+        IOptions<TireDbMatchingOptions> dbMatchingOptions, ICostEstimationService costEstimationService,
+        ILogger<RecognitionFacade> logger)
     {
         _contentTypeResolverService = contentTypeResolverService;
         _imageManipulationService = imageManipulationService;
@@ -38,6 +40,7 @@ public class RecognitionFacade : IRecognitionFacade
         _dbMatchingService = dbMatchingService;
         _preprocessingOptions = preprocessingOptions.Value;
         _dbMatchingOptions = dbMatchingOptions.Value;
+        _costEstimationService = costEstimationService;
         _logger = logger;
     }
 
@@ -58,6 +61,7 @@ public class RecognitionFacade : IRecognitionFacade
 
         var recognitionExecutionResult = await PerformRecognitionAsync(preprocessedImage, filename, contentType);
         var recognitionResult = recognitionExecutionResult.Result;
+        var estimatedCosts = _costEstimationService.EstimatedRecognitionCosts(recognitionResult);
 
         var postprocessingExecutionResult = await PerformPostprocessingAsync(recognitionResult.RecognizedTireCode!);
         var postprocessedTireCode = postprocessingExecutionResult.Result;

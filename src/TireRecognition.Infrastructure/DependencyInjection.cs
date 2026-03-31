@@ -65,6 +65,7 @@ public static class DependencyInjection
         services.AddScoped<ITireRimExtractionService, TireRimExtractionService>();
         services.AddScoped<IPostprocessingService, PostprocessingService>();
         services.AddScoped<IDbMatchingService, DbMatchingService>();
+        services.AddScoped<ICostEstimationService, CostEstimationService>();
 
         services.AddHttpClient<IRecognitionService, GeminiRecognitionService>();
     }
