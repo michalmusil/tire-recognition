@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using TireRecognition.Application.Exceptions;
 using TireRecognition.Application.Options;
 using TireRecognition.Application.Services;
+using TireRecognition.Domain.Postprocessing;
 using TireRecognition.Domain.Preprocessing;
 using TireRecognition.Domain.Recognition;
 
@@ -49,7 +50,7 @@ public class RecognitionFacade : IRecognitionFacade
 
         using var preprocessedImage = await PerformPreprocessing(imageDataStream, filename);
         var recognitionResult = await PerformRecognitionAsync(preprocessedImage, filename, contentType);
-        
+        var postprocessedTireCode = await PerformPostprocessingAsync(recognitionResult.RecognizedTireCode!);
     }
 
     private async Task<ImageDataHandle> PerformPreprocessing(Stream imageDataStream, string filename)
@@ -84,10 +85,10 @@ public class RecognitionFacade : IRecognitionFacade
         // Slice sidewall to prevent width-heavy aspect ratios
         var sliceWidth = (decimal)extractedTireStripHandle.Dimensions.Width /
                          (decimal)_preprocessingOptions.NumberOfSlices;
-        var sliceDimensions = new ImageDimensions(
-            Height: extractedTireStripHandle.Dimensions.Height,
-            Width: (int)Math.Ceiling(sliceWidth)
-        );
+        var sliceDimensions = extractedTireStripHandle.Dimensions with
+        {
+            Width = (int)Math.Ceiling(sliceWidth)
+        };
         var sidewallSlices = _imageManipulationService.SliceImage(
             image: extractedTireStripHandle,
             sliceDimensions: sliceDimensions,
@@ -127,9 +128,26 @@ public class RecognitionFacade : IRecognitionFacade
         if (result.RecognizedTireCode is null)
         {
             _logger.LogInformation($"[Recognition]: No tire code detected for image '{filename}'");
-            throw new NoTireCodeDetectedDuringRecognitionException();
+            throw new NoTireCodeDetectedDuringRecognitionException(filename);
         }
 
         return result;
+    }
+
+    private async Task<TireCode> PerformPostprocessingAsync(string rawTireCode)
+    {
+        _logger.LogInformation($"[Postprocessing]: Started for raw tire code '{rawTireCode}'");
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+        var extractedTireCodes = (await _postprocessingService.ExtractStructuredTireCodesAsync(rawTireCode)).ToList();
+        if (!extractedTireCodes.Any())
+        {
+            _logger.LogInformation($"[Postprocessing]: No valid tire code detected in raw tire code '{rawTireCode}'");
+            throw new NoTireCodeDetectedDuringPostprocessingException(rawTireCode);
+        }
+
+        var bestMatch = _postprocessingService.PickBestTireCode(extractedTireCodes)!;
+        _logger.LogInformation($"[Postprocessing]: Finished with '{bestMatch.GetProcessedCode()}'");
+        return bestMatch;
     }
 }
