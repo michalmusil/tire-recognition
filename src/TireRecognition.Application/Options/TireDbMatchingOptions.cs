@@ -16,4 +16,9 @@ public class TireDbMatchingOptions
     /// How long should the cached responses for valid tire codes and manufacturers be valid
     /// </summary>
     public int RemoteDbCacheExpirationMinutes { get; set; } = 60;
+    
+    /// <summary>
+    /// The default limit for results when matching recognized tire codes with actual tire code db entries 
+    /// </summary>
+    public int DefaultTireDbMatchingResultLimit { get; set; } = 30;
 }

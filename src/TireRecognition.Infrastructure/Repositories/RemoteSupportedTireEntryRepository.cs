@@ -56,7 +56,7 @@ public class RemoteSupportedTireEntryRepository : ISupportedTireEntryRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected exception while getting manufacturers from remote DB.");
-            throw;
+            return [];
         }
     }
 

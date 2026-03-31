@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using TireRecognition.Application.Exceptions;
 using TireRecognition.Application.Options;
 using TireRecognition.Application.Services;
+using TireRecognition.Domain.DbMatching;
 using TireRecognition.Domain.Postprocessing;
 using TireRecognition.Domain.Preprocessing;
 using TireRecognition.Domain.Recognition;
@@ -19,13 +20,14 @@ public class RecognitionFacade : IRecognitionFacade
     private readonly IPostprocessingService _postprocessingService;
     private readonly IDbMatchingService _dbMatchingService;
     private readonly PreprocessingOptions _preprocessingOptions;
+    private readonly TireDbMatchingOptions _dbMatchingOptions;
     private readonly ILogger<RecognitionFacade> _logger;
 
     public RecognitionFacade(IContentTypeResolverService contentTypeResolverService,
         IImageManipulationService imageManipulationService, ITireRimExtractionService tireRimExtractionService,
         IRecognitionService recognitionService, IPostprocessingService postprocessingService,
         IDbMatchingService dbMatchingService, IOptions<PreprocessingOptions> preprocessingOptions,
-        ILogger<RecognitionFacade> logger)
+        IOptions<TireDbMatchingOptions> dbMatchingOptions, ILogger<RecognitionFacade> logger)
     {
         _contentTypeResolverService = contentTypeResolverService;
         _imageManipulationService = imageManipulationService;
@@ -34,10 +36,12 @@ public class RecognitionFacade : IRecognitionFacade
         _postprocessingService = postprocessingService;
         _dbMatchingService = dbMatchingService;
         _preprocessingOptions = preprocessingOptions.Value;
+        _dbMatchingOptions = dbMatchingOptions.Value;
         _logger = logger;
     }
 
-    public async Task PerformRecognitionAsync(Stream imageDataStream, string filename, string contentType)
+    public async Task PerformRecognitionAsync(Stream imageDataStream, string filename, string contentType,
+        int? maxTireCodeDbMatchingEntries = 30)
     {
         _logger.LogInformation($"Started recognition pipeline for image '{filename}'");
         var contentTypeSupported = _contentTypeResolverService.IsContentTypeSupported(contentType);
@@ -51,6 +55,13 @@ public class RecognitionFacade : IRecognitionFacade
         using var preprocessedImage = await PerformPreprocessing(imageDataStream, filename);
         var recognitionResult = await PerformRecognitionAsync(preprocessedImage, filename, contentType);
         var postprocessedTireCode = await PerformPostprocessingAsync(recognitionResult.RecognizedTireCode!);
+
+        var tireEntryLimit = maxTireCodeDbMatchingEntries ?? _dbMatchingOptions.DefaultTireDbMatchingResultLimit;
+        var dbMatchingResult = await PerformDbMatchingAsync(
+            postprocessedTireCode,
+            recognitionResult.RecognizedManufacturer,
+            tireEntryLimit);
+        
     }
 
     private async Task<ImageDataHandle> PerformPreprocessing(Stream imageDataStream, string filename)
@@ -131,6 +142,8 @@ public class RecognitionFacade : IRecognitionFacade
             throw new NoTireCodeDetectedDuringRecognitionException(filename);
         }
 
+        _logger.LogInformation(
+            $"[Recognition]: Finished successfully with '{result.RecognizedTireCode}'. Time taken: {stopWatch.Elapsed.TotalMilliseconds}ms");
         return result;
     }
 
@@ -147,7 +160,32 @@ public class RecognitionFacade : IRecognitionFacade
         }
 
         var bestMatch = _postprocessingService.PickBestTireCode(extractedTireCodes)!;
-        _logger.LogInformation($"[Postprocessing]: Finished with '{bestMatch.GetProcessedCode()}'");
+        _logger.LogInformation(
+            $"[Postprocessing]: Finished with '{bestMatch.GetProcessedCode()}'. Time taken: {stopWatch.Elapsed.TotalMilliseconds}ms");
         return bestMatch;
+    }
+
+    private async Task<DbMatchingResult> PerformDbMatchingAsync(TireCode recognizedTireCode, string? rawManufacturer,
+        int maxTireCodeDbMatchingEntries)
+    {
+        var codeAsString = recognizedTireCode.GetProcessedCode();
+        _logger.LogInformation(
+            $"[DbMatching]: Started for tire code '{codeAsString}' with raw manufacturer '{rawManufacturer}'");
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+        var tireCodeMatches = await _dbMatchingService.GetOrderedDbMatchesForTireCodeAsync(
+            recognizedTireCode,
+            maxTireCodeDbMatchingEntries);
+        var manufacturerMatch = rawManufacturer is null
+            ? null
+            : await _dbMatchingService.GetManufacturerNameDbMatch(rawManufacturer);
+
+        if (tireCodeMatches.Count < 1)
+            _logger.LogWarning(
+                $"[DbMatching]: Detected tire code matches for code '{codeAsString}' were empty, indicating a problem with tire entry DB.");
+
+        _logger.LogInformation(
+            $"[DbMatching]: Finished for tire code '{codeAsString}'. Time taken: {stopWatch.Elapsed.TotalMilliseconds}ms");
+        return new DbMatchingResult(tireCodeMatches, manufacturerMatch);
     }
 }
