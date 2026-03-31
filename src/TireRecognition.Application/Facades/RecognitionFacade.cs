@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using TireRecognition.Application.Exceptions;
 using TireRecognition.Application.Options;
 using TireRecognition.Application.Services;
+using TireRecognition.Domain;
 using TireRecognition.Domain.DbMatching;
 using TireRecognition.Domain.Postprocessing;
 using TireRecognition.Domain.Preprocessing;
@@ -52,19 +53,24 @@ public class RecognitionFacade : IRecognitionFacade
             throw new ContentTypeNotSupported(contentType);
         }
 
-        using var preprocessedImage = await PerformPreprocessing(imageDataStream, filename);
-        var recognitionResult = await PerformRecognitionAsync(preprocessedImage, filename, contentType);
-        var postprocessedTireCode = await PerformPostprocessingAsync(recognitionResult.RecognizedTireCode!);
+        var preprocessingExecutionResult = await PerformPreprocessing(imageDataStream, filename);
+        using var preprocessedImage = preprocessingExecutionResult.Result;
+
+        var recognitionExecutionResult = await PerformRecognitionAsync(preprocessedImage, filename, contentType);
+        var recognitionResult = recognitionExecutionResult.Result;
+
+        var postprocessingExecutionResult = await PerformPostprocessingAsync(recognitionResult.RecognizedTireCode!);
+        var postprocessedTireCode = postprocessingExecutionResult.Result;
 
         var tireEntryLimit = maxTireCodeDbMatchingEntries ?? _dbMatchingOptions.DefaultTireDbMatchingResultLimit;
-        var dbMatchingResult = await PerformDbMatchingAsync(
+        var dbMatchingExecutionResult = await PerformDbMatchingAsync(
             postprocessedTireCode,
             recognitionResult.RecognizedManufacturer,
             tireEntryLimit);
-        
     }
 
-    private async Task<ImageDataHandle> PerformPreprocessing(Stream imageDataStream, string filename)
+    private async Task<MeasuredExecutionTimeResult<ImageDataHandle>> PerformPreprocessing(Stream imageDataStream,
+        string filename)
     {
         _logger.LogInformation($"[Preprocessing]: Started for image '{filename}'");
         var stopWatch = new Stopwatch();
@@ -79,9 +85,14 @@ public class RecognitionFacade : IRecognitionFacade
         if (detectedRimPosition is null)
         {
             ApplyFinalPreprocessingActions(inputImageHandle);
+            var timeTaken = stopWatch.Elapsed;
             _logger.LogInformation(
-                $"[Preprocessing]: No rim detected in image '{filename}'. Returning backup. Time taken: {stopWatch.Elapsed.TotalMilliseconds}ms");
-            return inputImageHandle;
+                $"[Preprocessing]: No rim detected in image '{filename}'. Returning backup. Time taken: {timeTaken.TotalMilliseconds}ms");
+            return new MeasuredExecutionTimeResult<ImageDataHandle>
+            {
+                ExecutionTime = timeTaken,
+                Result = inputImageHandle
+            };
         }
 
         // Extract sidewall strip
@@ -112,9 +123,14 @@ public class RecognitionFacade : IRecognitionFacade
         var finalImage = _imageManipulationService.StackImagesVertically(sidewallSlices);
         sidewallSlices.ForEach(s => s.Dispose());
         ApplyFinalPreprocessingActions(finalImage);
+        var elapsed = stopWatch.Elapsed;
         _logger.LogInformation(
-            $"[Preprocessing]: Successfully finished for '{filename}'. Time taken: {stopWatch.Elapsed.TotalMilliseconds}ms");
-        return finalImage;
+            $"[Preprocessing]: Successfully finished for '{filename}'. Time taken: {elapsed.TotalMilliseconds}ms");
+        return new MeasuredExecutionTimeResult<ImageDataHandle>
+        {
+            ExecutionTime = elapsed,
+            Result = finalImage
+        };
     }
 
     private void ApplyFinalPreprocessingActions(ImageDataHandle image)
@@ -127,7 +143,8 @@ public class RecognitionFacade : IRecognitionFacade
         _imageManipulationService.ScaleToMaxDimension(image, _preprocessingOptions.MaxInputImageSize);
     }
 
-    private async Task<RecognitionResult> PerformRecognitionAsync(ImageDataHandle preprocessedImage, string filename,
+    private async Task<MeasuredExecutionTimeResult<RecognitionResult>> PerformRecognitionAsync(
+        ImageDataHandle preprocessedImage, string filename,
         string contentType)
     {
         _logger.LogInformation($"[Recognition]: Started for image '{filename}'");
@@ -142,12 +159,17 @@ public class RecognitionFacade : IRecognitionFacade
             throw new NoTireCodeDetectedDuringRecognitionException(filename);
         }
 
+        var elapsed = stopWatch.Elapsed;
         _logger.LogInformation(
-            $"[Recognition]: Finished successfully with '{result.RecognizedTireCode}'. Time taken: {stopWatch.Elapsed.TotalMilliseconds}ms");
-        return result;
+            $"[Recognition]: Finished successfully with '{result.RecognizedTireCode}'. Time taken: {elapsed.TotalMilliseconds}ms");
+        return new MeasuredExecutionTimeResult<RecognitionResult>
+        {
+            ExecutionTime = elapsed,
+            Result = result
+        };
     }
 
-    private async Task<TireCode> PerformPostprocessingAsync(string rawTireCode)
+    private async Task<MeasuredExecutionTimeResult<TireCode>> PerformPostprocessingAsync(string rawTireCode)
     {
         _logger.LogInformation($"[Postprocessing]: Started for raw tire code '{rawTireCode}'");
         var stopWatch = new Stopwatch();
@@ -160,13 +182,18 @@ public class RecognitionFacade : IRecognitionFacade
         }
 
         var bestMatch = _postprocessingService.PickBestTireCode(extractedTireCodes)!;
+        var elapsed = stopWatch.Elapsed;
         _logger.LogInformation(
-            $"[Postprocessing]: Finished with '{bestMatch.GetProcessedCode()}'. Time taken: {stopWatch.Elapsed.TotalMilliseconds}ms");
-        return bestMatch;
+            $"[Postprocessing]: Finished with '{bestMatch.GetProcessedCode()}'. Time taken: {elapsed.TotalMilliseconds}ms");
+        return new MeasuredExecutionTimeResult<TireCode>
+        {
+            ExecutionTime = elapsed,
+            Result = bestMatch
+        };
     }
 
-    private async Task<DbMatchingResult> PerformDbMatchingAsync(TireCode recognizedTireCode, string? rawManufacturer,
-        int maxTireCodeDbMatchingEntries)
+    private async Task<MeasuredExecutionTimeResult<DbMatchingResult>> PerformDbMatchingAsync(
+        TireCode recognizedTireCode, string? rawManufacturer, int maxTireCodeDbMatchingEntries)
     {
         var codeAsString = recognizedTireCode.GetProcessedCode();
         _logger.LogInformation(
@@ -184,8 +211,13 @@ public class RecognitionFacade : IRecognitionFacade
             _logger.LogWarning(
                 $"[DbMatching]: Detected tire code matches for code '{codeAsString}' were empty, indicating a problem with tire entry DB.");
 
+        var elapsed = stopWatch.Elapsed;
         _logger.LogInformation(
-            $"[DbMatching]: Finished for tire code '{codeAsString}'. Time taken: {stopWatch.Elapsed.TotalMilliseconds}ms");
-        return new DbMatchingResult(tireCodeMatches, manufacturerMatch);
+            $"[DbMatching]: Finished for tire code '{codeAsString}'. Time taken: {elapsed.TotalMilliseconds}ms");
+        return new MeasuredExecutionTimeResult<DbMatchingResult>
+        {
+            ExecutionTime = elapsed,
+            Result = new DbMatchingResult(tireCodeMatches, manufacturerMatch)
+        };
     }
 }
