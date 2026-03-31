@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using TireRecognition.Application.Options;
 using TireRecognition.Application.Services;
 using TireRecognition.Domain.Recognition;
@@ -9,9 +10,9 @@ public class CostEstimationService : ICostEstimationService
     private const decimal Million = 1000000;
     private readonly RecognitionOptions _recognitionOptions;
 
-    public CostEstimationService(RecognitionOptions recognitionOptions)
+    public CostEstimationService(IOptions<RecognitionOptions> recognitionOptions)
     {
-        _recognitionOptions = recognitionOptions;
+        _recognitionOptions = recognitionOptions.Value;
     }
 
     public EstimatedRecognitionCosts EstimatedRecognitionCosts(RecognitionResult recognitionResult)

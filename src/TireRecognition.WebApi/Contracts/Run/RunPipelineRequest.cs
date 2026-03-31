@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TireRecognition.WebApi.Contracts.Run;
 
-public record RunRequest(
-    [Required] IFormFile Image
+public record RunPipelineRequest(
+    [Required] IFormFile Image,
+    int? DbMatchingResultLimit
 );

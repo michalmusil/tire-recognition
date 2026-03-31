@@ -44,7 +44,12 @@ public class CvImageManipulationService : IImageManipulationService
     public void ApplyBilateralFilter(ImageDataHandle image)
     {
         var cvHandle = image.ToCvDataHandle();
-        Cv2.BilateralFilter(cvHandle.Data, cvHandle.Data, 5, 40, 40);
+        var unfilteredData = cvHandle.Data;
+        var filteredData = new Mat();
+        
+        Cv2.BilateralFilter(unfilteredData, filteredData, 5, 40, 40);
+        cvHandle.Data =  filteredData;
+        unfilteredData.Dispose();
     }
 
     public void ApplyBitwiseNot(ImageDataHandle image)
