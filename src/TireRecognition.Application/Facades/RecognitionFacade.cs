@@ -44,9 +44,14 @@ public class RecognitionFacade : IRecognitionFacade
         _logger = logger;
     }
 
-    public async Task PerformRecognitionAsync(Stream imageDataStream, string filename, string contentType,
-        int? maxTireCodeDbMatchingEntries = 30)
+    public async Task<RecognitionPipelineResult> PerformRecognitionAsync(
+        Stream imageDataStream,
+        string filename,
+        string contentType,
+        int? maxTireCodeDbMatchingEntries = 30
+    )
     {
+        await using var inputImageStream = imageDataStream;
         _logger.LogInformation($"Started recognition pipeline for image '{filename}'");
         var contentTypeSupported = _contentTypeResolverService.IsContentTypeSupported(contentType);
         if (!contentTypeSupported)
@@ -56,7 +61,7 @@ public class RecognitionFacade : IRecognitionFacade
             throw new ContentTypeNotSupported(contentType);
         }
 
-        var preprocessingExecutionResult = await PerformPreprocessing(imageDataStream, filename);
+        var preprocessingExecutionResult = await PerformPreprocessing(inputImageStream, filename);
         using var preprocessedImage = preprocessingExecutionResult.Result;
 
         var recognitionExecutionResult = await PerformRecognitionAsync(preprocessedImage, filename, contentType);
@@ -71,6 +76,21 @@ public class RecognitionFacade : IRecognitionFacade
             postprocessedTireCode,
             recognitionResult.RecognizedManufacturer,
             tireEntryLimit);
+        var dbMatchingResult = dbMatchingExecutionResult.Result;
+
+        return new RecognitionPipelineResult(
+            RecognitionResult: recognitionResult,
+            EstimatedCosts: estimatedCosts,
+            PostprocessedTireCode: postprocessedTireCode,
+            DbMatchingResult: dbMatchingResult,
+            ExecutionDetails:
+            [
+                new PipelineStepExecutionDetail("Preprocessing", preprocessingExecutionResult.ExecutionTime),
+                new PipelineStepExecutionDetail("Recognition", recognitionExecutionResult.ExecutionTime),
+                new PipelineStepExecutionDetail("Postprocessing", postprocessingExecutionResult.ExecutionTime),
+                new PipelineStepExecutionDetail("DbMatching", dbMatchingExecutionResult.ExecutionTime),
+            ]
+        );
     }
 
     private async Task<MeasuredExecutionTimeResult<ImageDataHandle>> PerformPreprocessing(Stream imageDataStream,
@@ -81,7 +101,6 @@ public class RecognitionFacade : IRecognitionFacade
         stopWatch.Start();
 
         var inputImageHandle = _imageManipulationService.GetImageHandleFromStream(imageDataStream);
-        await imageDataStream.DisposeAsync();
         _imageManipulationService.ScaleToMaxDimension(inputImageHandle, _preprocessingOptions.MaxInputImageSize);
 
         // Detect tire rim

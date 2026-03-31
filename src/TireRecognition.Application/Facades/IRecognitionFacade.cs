@@ -1,7 +1,13 @@
+using TireRecognition.Domain;
+
 namespace TireRecognition.Application.Facades;
 
 public interface IRecognitionFacade
 {
-    public Task PerformRecognitionAsync(Stream imageDataStream, string filename, string contentType,
-        int? maxTireCodeDbMatchingEntries);
+    public Task<RecognitionPipelineResult> PerformRecognitionAsync(
+        Stream imageDataStream,
+        string filename,
+        string contentType,
+        int? maxTireCodeDbMatchingEntries
+    );
 }
