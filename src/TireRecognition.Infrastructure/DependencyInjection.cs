@@ -5,6 +5,7 @@ using SkiaSharp;
 using TireRecognition.Application.Options;
 using TireRecognition.Application.Repositories;
 using TireRecognition.Application.Services;
+using TireRecognition.Infrastructure.Extensions;
 using TireRecognition.Infrastructure.Repositories;
 using TireRecognition.Infrastructure.Services;
 using YoloDotNet;
@@ -20,7 +21,7 @@ public static class DependencyInjection
     {
         AddOptions(services, configuration);
         AddMlModels(services);
-        AddRepositories(services, configuration);
+        AddRepositories(services);
         AddServices(services);
         return services;
     }
@@ -30,6 +31,7 @@ public static class DependencyInjection
         services.Configure<PreprocessingOptions>(configuration.GetSection(key: nameof(PreprocessingOptions)));
         services.Configure<RecognitionOptions>(configuration.GetSection(key: nameof(RecognitionOptions)));
         services.Configure<TireDbMatchingOptions>(configuration.GetSection(key: nameof(TireDbMatchingOptions)));
+        services.Configure<ResilienceOptions>(configuration.GetSection(key: nameof(ResilienceOptions)));
     }
 
     private static void AddMlModels(IServiceCollection services)
@@ -50,12 +52,17 @@ public static class DependencyInjection
         });
     }
 
-    private static void AddRepositories(IServiceCollection services, IConfiguration configuration)
+    private static void AddRepositories(IServiceCollection services)
     {
+        using var sp = services.BuildServiceProvider();
+        var resilienceOptions = sp.GetRequiredService<IOptions<ResilienceOptions>>().Value;
         services.AddMemoryCache();
 
-        services.AddHttpClient<ISupportedTireEntryRepository, RemoteSupportedTireEntryRepository>();
-        services.AddHttpClient<ISupportedManufacturerRepository, RemoteSupportedManufacturerRepository>();
+        services.AddHttpClient<ISupportedTireEntryRepository, RemoteSupportedTireEntryRepository>()
+            .AddConfiguredResilience(resilienceOptions);
+        services.AddHttpClient<ISupportedManufacturerRepository, RemoteSupportedManufacturerRepository>()
+            .AddConfiguredResilience(resilienceOptions);
+        ;
     }
 
     private static void AddServices(IServiceCollection services)
@@ -67,6 +74,10 @@ public static class DependencyInjection
         services.AddScoped<IDbMatchingService, DbMatchingService>();
         services.AddScoped<ICostEstimationService, CostEstimationService>();
 
-        services.AddHttpClient<IRecognitionService, GeminiRecognitionService>();
+        using var sp = services.BuildServiceProvider();
+        var resilienceOptions = sp.GetRequiredService<IOptions<ResilienceOptions>>().Value;
+        services.AddHttpClient<IRecognitionService, GeminiRecognitionService>()
+            .AddConfiguredResilience(resilienceOptions);
+        ;
     }
 }

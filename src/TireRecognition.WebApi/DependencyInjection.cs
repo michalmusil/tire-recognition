@@ -1,5 +1,4 @@
 using System.Reflection;
-using TireRecognition.Application.Options;
 using TireRecognition.WebApi.ExceptionHandlers;
 
 namespace TireRecognition.WebApi;
@@ -8,17 +7,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {
-        AddOptions(services, configuration);
         ApplyApiConfiguration(services);
         AddExceptionHandlers(services);
         return services;
-    }
-
-    private static void AddOptions(IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<PreprocessingOptions>(configuration.GetSection(key: nameof(PreprocessingOptions)));
-        services.Configure<RecognitionOptions>(configuration.GetSection(key: nameof(RecognitionOptions)));
-        services.Configure<TireDbMatchingOptions>(configuration.GetSection(key: nameof(TireDbMatchingOptions)));
     }
 
     private static void ApplyApiConfiguration(IServiceCollection services)
@@ -31,7 +22,7 @@ public static class DependencyInjection
             opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
     }
-    
+
     private static void AddExceptionHandlers(IServiceCollection services)
     {
         services.AddExceptionHandler<HttpTranslatableExceptionHandler>();
