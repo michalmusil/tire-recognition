@@ -38,6 +38,13 @@ public class GeminiRecognitionService : IRecognitionService
             var responseContent = await response.Content.ReadAsStringAsync();
             var responseDto = JsonSerializer.Deserialize<GeminiResponseDto>(responseContent);
 
+            var responseString = responseDto?.ContentCandidates
+                .FirstOrDefault(c => c.Content.Role == "model")?
+                .Content.Parts
+                .FirstOrDefault()?.Text;
+            if (responseString is not null)
+                _logger.LogInformation($"{nameof(GeminiRecognitionService)} responsed with '{responseString}'");
+
             var validResponseString = responseDto?.ContentCandidates
                 .SelectMany(c => c.Content.Parts)
                 .FirstOrDefault(p => !string.IsNullOrEmpty(p.Text) && p.Text.Contains('/'))
@@ -54,8 +61,8 @@ public class GeminiRecognitionService : IRecognitionService
                 if (manufacturerFound)
                 {
                     foundTireCode = validResponseString.Substring(0, indexOfManufacturerSplit);
-                    if (indexOfManufacturerSplit < foundTireCode.Length - 1)
-                        foundManufacturer = foundTireCode.Substring(indexOfManufacturerSplit + 1);
+                    if (indexOfManufacturerSplit < validResponseString.Length - 1)
+                        foundManufacturer = validResponseString.Substring(indexOfManufacturerSplit + 1);
                 }
             }
 
