@@ -1,5 +1,6 @@
 using System.Reflection;
 using TireRecognition.Application.Options;
+using TireRecognition.WebApi.ExceptionHandlers;
 
 namespace TireRecognition.WebApi;
 
@@ -9,6 +10,7 @@ public static class DependencyInjection
     {
         AddOptions(services, configuration);
         ApplyApiConfiguration(services);
+        AddExceptionHandlers(services);
         return services;
     }
 
@@ -28,5 +30,11 @@ public static class DependencyInjection
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
+    }
+    
+    private static void AddExceptionHandlers(IServiceCollection services)
+    {
+        services.AddExceptionHandler<HttpTranslatableExceptionHandler>();
+        services.AddProblemDetails();
     }
 }

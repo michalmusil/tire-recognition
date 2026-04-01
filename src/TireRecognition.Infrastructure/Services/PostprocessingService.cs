@@ -27,7 +27,7 @@ public class PostprocessingService : IPostprocessingService
         }
 
         var tireCodes = anchors
-            .Select(a => ProcessPotentialTireCode(a, cleanedUpTireCode))
+            .Select(a => ProcessPotentialTireCode(a, cleanedUpTireCode, rawTireCode))
             .ToList();
         _logger.LogInformation($"Found {tireCodes.Count} potential tire codes in '{cleanedUpTireCode}'");
 
@@ -99,11 +99,11 @@ public class PostprocessingService : IPostprocessingService
         return regex.Matches(rawTireCode);
     }
 
-    private TireCode ProcessPotentialTireCode(Match tireCodeAnchorMatch, string code)
+    private TireCode ProcessPotentialTireCode(Match tireCodeAnchorMatch, string cleanedUpCode, string rawCode)
     {
         var tireCode = new TireCode
         {
-            RawCode = code,
+            RawCode = rawCode,
         };
 
         var aspectRatioValid = decimal.TryParse(tireCodeAnchorMatch.Groups["AspectRatio"].Value, out var aspectRatio);
@@ -112,10 +112,10 @@ public class PostprocessingService : IPostprocessingService
 
         tireCode.AspectRatio = aspectRatio;
 
-        var leftOfAnchor = tireCode.RawCode.Substring(0, tireCodeAnchorMatch.Index);
+        var leftOfAnchor = cleanedUpCode.Substring(0, tireCodeAnchorMatch.Index);
         ExtractSectionWidth(tireCode, leftOfAnchor);
 
-        var rightOfAnchor = tireCode.RawCode.Substring(tireCodeAnchorMatch.Index + tireCodeAnchorMatch.Length);
+        var rightOfAnchor = cleanedUpCode.Substring(tireCodeAnchorMatch.Index + tireCodeAnchorMatch.Length);
         var constructionAndDeprecatedSpeedRatingCharCount = ExtractConstructionAndDeprecatedSpeedRating(
             tireCode,
             rightOfAnchor

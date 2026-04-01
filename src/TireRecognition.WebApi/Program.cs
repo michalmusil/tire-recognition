@@ -12,6 +12,7 @@ builder.Services
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 app.AddSwagger();
 app.UseHttpsRedirection();
 app.MapControllers();
