@@ -1,6 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using SkiaSharp;
 using TireRecognition.Application.Options;
 using TireRecognition.Application.Repositories;
@@ -17,12 +21,14 @@ namespace TireRecognition.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration,
+        ILoggingBuilder loggingBuilder)
     {
         AddOptions(services, configuration);
         AddMlModels(services);
         AddRepositories(services);
         AddServices(services);
+        AddOtel(services, configuration, loggingBuilder);
         return services;
     }
 
@@ -79,5 +85,31 @@ public static class DependencyInjection
         services.AddHttpClient<IRecognitionService, GeminiRecognitionService>()
             .AddConfiguredResilience(resilienceOptions);
         ;
+    }
+
+    private static void AddOtel(IServiceCollection services, IConfiguration configuration,
+        ILoggingBuilder loggingBuilder)
+    {
+        var otelEnabled = configuration.GetValue<bool>("OTEL:Enabled");
+        if (!otelEnabled)
+            return;
+
+        services.AddOpenTelemetry()
+            .WithTracing(tracing => tracing
+                .AddSource("TireRecognition")
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation())
+            .WithMetrics(metrics => metrics
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddRuntimeInstrumentation());
+
+        loggingBuilder.AddOpenTelemetry(logging =>
+        {
+            logging.IncludeFormattedMessage = true;
+            logging.IncludeScopes = true;
+        });
+
+        services.AddOpenTelemetry().UseOtlpExporter();
     }
 }
