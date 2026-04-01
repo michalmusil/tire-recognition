@@ -90,13 +90,13 @@ public static class DependencyInjection
     private static void AddOtel(IServiceCollection services, IConfiguration configuration,
         ILoggingBuilder loggingBuilder)
     {
-        var otelEnabled = configuration.GetValue<bool>("OTEL:Enabled");
+        var otelEnabled = configuration.GetValue<bool>("OTEL_ENABLED");
         if (!otelEnabled)
             return;
 
         services.AddOpenTelemetry()
             .WithTracing(tracing => tracing
-                .AddSource("TireRecognition")
+                .AddSource(configuration.GetValue<string>("OTEL_SERVICE_NAME") ?? "TireRecognition")
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation())
             .WithMetrics(metrics => metrics
