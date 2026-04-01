@@ -38,6 +38,7 @@ public static class DependencyInjection
         services.Configure<RecognitionOptions>(configuration.GetSection(key: nameof(RecognitionOptions)));
         services.Configure<TireDbMatchingOptions>(configuration.GetSection(key: nameof(TireDbMatchingOptions)));
         services.Configure<ResilienceOptions>(configuration.GetSection(key: nameof(ResilienceOptions)));
+        services.Configure<AuthOptions>(configuration.GetSection(key: nameof(AuthOptions)));
     }
 
     private static void AddMlModels(IServiceCollection services)

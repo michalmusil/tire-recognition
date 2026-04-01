@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TireRecognition.Application.Facades;
 using TireRecognition.WebApi.Contracts.Run;
@@ -6,6 +7,7 @@ using TireRecognition.WebApi.Contracts.Run.Dtos;
 
 namespace TireRecognition.WebApi.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class RunController : ControllerBase

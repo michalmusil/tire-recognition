@@ -1,9 +1,8 @@
-using TireRecognition.Shared.Exceptions;
-
-namespace TireRecognition.WebApi.ExceptionHandlers;
-
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using TireRecognition.Shared.Exceptions;
+
+namespace TireRecognition.WebApi.Middleware;
 
 public class HttpTranslatableExceptionHandler : IExceptionHandler
 {
