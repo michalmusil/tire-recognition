@@ -1,0 +1,18 @@
+name: Build and publish docker images to registry
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  publish_images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        run: docker login -u michalmusil -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Build all docker images
+        run: chmod +x deploy/service/build.sh && deploy/service/build.sh
+      - name: Push all built images to Docker Hub
+        run: chmod +x deploy/service/publish.sh && deploy/service/publish.sh
