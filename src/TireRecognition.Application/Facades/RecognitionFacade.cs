@@ -44,7 +44,7 @@ public class RecognitionFacade : IRecognitionFacade
         _logger = logger;
     }
 
-    public async Task<RecognitionPipelineResult> PerformRecognitionAsync(
+    public async Task<RecognitionPipelineResult> ExecuteRecognitionPipelineAsync(
         Stream imageDataStream,
         string filename,
         string contentType,

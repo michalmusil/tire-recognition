@@ -83,7 +83,7 @@ public class RunController : ControllerBase
         var imageFileName = pipelineRequest.Image.FileName;
         var imageContentType = pipelineRequest.Image.ContentType;
         var imageDataStream = pipelineRequest.Image.OpenReadStream();
-        var result = await _recognitionFacade.PerformRecognitionAsync(
+        var result = await _recognitionFacade.ExecuteRecognitionPipelineAsync(
             imageDataStream: imageDataStream,
             filename: imageFileName,
             contentType: imageContentType,

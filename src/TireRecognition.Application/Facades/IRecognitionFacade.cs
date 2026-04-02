@@ -4,7 +4,7 @@ namespace TireRecognition.Application.Facades;
 
 public interface IRecognitionFacade
 {
-    public Task<RecognitionPipelineResult> PerformRecognitionAsync(
+    public Task<RecognitionPipelineResult> ExecuteRecognitionPipelineAsync(
         Stream imageDataStream,
         string filename,
         string contentType,
