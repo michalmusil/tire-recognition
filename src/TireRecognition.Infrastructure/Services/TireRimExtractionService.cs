@@ -45,10 +45,10 @@ public class TireRimExtractionService : ITireRimExtractionService
 
         // If rim is found, get a mask for it and get it's contour
         using var mask = ConvertSegmentationMaskToMat(
-                detectedImage: imageToDetect,
-                segmentationResult: rimMaskResult
-            )
-            .Threshold(1, 255, ThresholdTypes.Binary);
+            detectedImage: imageToDetect,
+            segmentationResult: rimMaskResult
+        );
+        Cv2.Threshold(mask, mask, 1, 255, ThresholdTypes.Binary);
         using var invertedMask = new Mat();
         Cv2.BitwiseNot(mask, invertedMask);
         invertedMask.FindContours(out var contours, out _,
@@ -113,9 +113,11 @@ public class TireRimExtractionService : ITireRimExtractionService
         var height = detectedImage.Height;
         var width = detectedImage.Width;
 
-        var rimMask = new Mat(height, width, MatType.CV_8UC1, Scalar.White);
         var bbox = segmentationResult.BoundingBox;
         var maskData = segmentationResult.BitPackedPixelMask;
+        var rimMask = new Mat(height, width, MatType.CV_8UC1, Scalar.White);
+        // By using the indexer, many memory allocations are prevented & the operation speeds up significantly (seconds)
+        var rimMaskIndexer = rimMask.GetUnsafeGenericIndexer<byte>();
 
         // Iterate through the bounding box only (where the mask exists)
         for (var y = 0; y < bbox.Height; y++)
@@ -136,7 +138,7 @@ public class TireRimExtractionService : ITireRimExtractionService
                 {
                     // Map local bounding box coordinates back to global image coordinates
                     // Set to 0 (black)
-                    rimMask.Set(bbox.Top + y, bbox.Left + x, (byte)0);
+                    rimMaskIndexer[bbox.Top + y, bbox.Left + x] = 0;
                 }
             }
         }
