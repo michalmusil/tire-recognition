@@ -163,7 +163,7 @@ public class RecognitionFacade : IRecognitionFacade
         _imageManipulationService.ApplyBilateralFilter(image);
         _imageManipulationService.ApplyBitwiseNot(image);
         // Reduce output image size
-        _imageManipulationService.ScaleToMaxDimension(image, _preprocessingOptions.MaxInputImageSize);
+        _imageManipulationService.ScaleToMaxDimension(image, _preprocessingOptions.MaxOutputImageSize);
     }
 
     private async Task<MeasuredExecutionTimeResult<RecognitionResult>> PerformRecognitionAsync(

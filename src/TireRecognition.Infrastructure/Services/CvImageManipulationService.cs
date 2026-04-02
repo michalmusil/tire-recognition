@@ -46,9 +46,9 @@ public class CvImageManipulationService : IImageManipulationService
         var cvHandle = image.ToCvDataHandle();
         var unfilteredData = cvHandle.Data;
         var filteredData = new Mat();
-        
+
         Cv2.BilateralFilter(unfilteredData, filteredData, 5, 40, 40);
-        cvHandle.Data =  filteredData;
+        cvHandle.Data = filteredData;
         unfilteredData.Dispose();
     }
 

@@ -119,6 +119,9 @@ public class TireRimExtractionService : ITireRimExtractionService
         // By using the indexer, many memory allocations are prevented & the operation speeds up significantly (seconds)
         var rimMaskIndexer = rimMask.GetUnsafeGenericIndexer<byte>();
 
+        var xBaseline = Math.Max(bbox.Left, 0);
+        var yBaseline = Math.Max(bbox.Top, 0);
+
         // Iterate through the bounding box only (where the mask exists)
         for (var y = 0; y < bbox.Height; y++)
         {
@@ -138,7 +141,7 @@ public class TireRimExtractionService : ITireRimExtractionService
                 {
                     // Map local bounding box coordinates back to global image coordinates
                     // Set to 0 (black)
-                    rimMaskIndexer[bbox.Top + y, bbox.Left + x] = 0;
+                    rimMaskIndexer[yBaseline + y, xBaseline + x] = 0;
                 }
             }
         }
