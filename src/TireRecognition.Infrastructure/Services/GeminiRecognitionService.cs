@@ -30,8 +30,12 @@ public class GeminiRecognitionService : IRecognitionService
         try
         {
             using var prompt = GetPromptJsonBody(image, contentType);
+            using var request = new HttpRequestMessage(HttpMethod.Post, _recognitionOptions.VlmEndpoint);
+            request.Headers.Add("x-goog-api-key", _recognitionOptions.VlmApiKey);
+            request.Content = prompt;
+
             _logger.LogInformation($"Sending recognition request via {nameof(GeminiRecognitionService)}");
-            using var response = await _httpClient.PostAsync(GetPromptEndpointUri(), prompt);
+            using var response = await _httpClient.SendAsync(request);
             _logger.LogInformation($"Received recognition response via {nameof(GeminiRecognitionService)}");
             response.EnsureSuccessStatusCode();
 
@@ -80,8 +84,6 @@ public class GeminiRecognitionService : IRecognitionService
             throw new RemoteRecognitionEngineFailed(nameof(GeminiRecognitionService));
         }
     }
-
-    private string GetPromptEndpointUri() => $"{_recognitionOptions.VlmEndpoint}?key={_recognitionOptions.VlmApiKey}";
 
     private StringContent GetPromptJsonBody(ImageDataHandle image, string contentType)
     {
