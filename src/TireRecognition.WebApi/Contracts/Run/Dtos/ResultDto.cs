@@ -4,9 +4,9 @@ namespace TireRecognition.WebApi.Contracts.Run.Dtos;
 
 public record ResultDto(
     string ImageFileName,
-    RecognitionResponseDto OcrResponse,
-    PostprocessingResponseDto PostprocessingResult,
-    DbMatchingResponseDto TasyDbMatchesResult,
+    RecognitionResultDto OcrResult,
+    PostprocessingResultDto PostprocessingResult,
+    DbMatchingResultDto TasyDbMatchesResult,
     double TotalDurationMs,
     List<RunStatDto> RunTrace
 )
@@ -17,9 +17,9 @@ public record ResultDto(
         TimeSpan totalDuration
     ) => new(
         ImageFileName: imageFileName,
-        OcrResponse: RecognitionResponseDto.FromDomain(domain.RecognitionResult, domain.EstimatedCosts),
-        PostprocessingResult: PostprocessingResponseDto.FromDomain(domain.PostprocessedTireCode),
-        TasyDbMatchesResult: DbMatchingResponseDto.FromDomain(domain.DbMatchingResult),
+        OcrResult: RecognitionResultDto.FromDomain(domain.RecognitionResult, domain.EstimatedCosts),
+        PostprocessingResult: PostprocessingResultDto.FromDomain(domain.PostprocessedTireCode),
+        TasyDbMatchesResult: DbMatchingResultDto.FromDomain(domain.DbMatchingResult),
         TotalDurationMs: totalDuration.TotalMilliseconds,
         RunTrace: domain.ExecutionDetails.Select(RunStatDto.FromDomain).ToList()
     );

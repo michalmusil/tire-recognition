@@ -2,12 +2,12 @@ using TireRecognition.Domain.DbMatching;
 
 namespace TireRecognition.WebApi.Contracts.Run.Dtos;
 
-public record DbMatchingResponseDto(
+public record DbMatchingResultDto(
     List<TireDbMatchDto> OrderedTireCodeDbMatches,
     string? ManufacturerDbMatch
 )
 {
-    public static DbMatchingResponseDto FromDomain(DbMatchingResult domain) => new(
+    public static DbMatchingResultDto FromDomain(DbMatchingResult domain) => new(
         OrderedTireCodeDbMatches: domain.TireDbMatches.Select(TireDbMatchDto.FromDomain).ToList(),
         ManufacturerDbMatch: domain.ManufacturerDbMatch
     );

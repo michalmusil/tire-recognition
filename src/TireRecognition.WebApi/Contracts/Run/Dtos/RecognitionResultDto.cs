@@ -2,13 +2,13 @@ using TireRecognition.Domain.Recognition;
 
 namespace TireRecognition.WebApi.Contracts.Run.Dtos;
 
-public record RecognitionResponseDto(
+public record RecognitionResultDto(
     string DetectedCode,
     string? DetectedManufacturer,
     EstimatedCostsDto? EstimatedCosts
 )
 {
-    public static RecognitionResponseDto FromDomain(
+    public static RecognitionResultDto FromDomain(
         RecognitionResult domainResult,
         EstimatedRecognitionCosts domainCostEstimation
     ) => new(

@@ -3,7 +3,7 @@ using TireRecognition.Domain.Postprocessing;
 
 namespace TireRecognition.WebApi.Contracts.Run.Dtos;
 
-public record PostprocessingResponseDto(
+public record PostprocessingResultDto(
     string RawCode,
     string PostprocessedTireCode,
     decimal? Width,
@@ -16,7 +16,7 @@ public record PostprocessingResponseDto(
     string? SpeedRating
 )
 {
-    public static PostprocessingResponseDto FromDomain(TireCode domain) => new(
+    public static PostprocessingResultDto FromDomain(TireCode domain) => new(
         RawCode: domain.RawCode,
         PostprocessedTireCode: domain.GetProcessedCode(),
         Width: domain.Width,
