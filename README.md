@@ -19,8 +19,7 @@ The application is customizable via `appsettings.json` or Environment Variables.
 
 ### 1. Authentication (`AuthOptions`)
 
-- **`Enabled`**: Toggle API key authentication for the API.
-- **`SchemeName`**: Name of the auth scheme.
+- **`Enabled`**: Toggle API key authentication for the API. Default is false.
 - **`ApiKey`**: The valid value for the `X-API-KEY` header when API key authentication is enabled.
 
 ### 2. Preprocessing (`PreprocessingOptions`)
@@ -94,19 +93,20 @@ Use `build.sh` to create the Docker image. Modify the script image name variable
 
 #### Running the Container
 
-The `/deploy/service/run.sh` script is the primary way to launch the service. It maps local variables to container environment variables using the `Section__Property` syntax.
+The `/deploy/service/run.sh` is an utility script to launch the service container with shortcuts for tuning the service parameters via local variables. It maps local variables to container environment variables using the `Section__Property` syntax.
 
 ##### Essential Variables
 
-Secret values and sensitive configurations must be specified in a `.env` file located in the `/deploy/service` directory. This file should follow the `Section__Property` syntax to correctly map to the application's configuration.
+Required secret values and sensitive configurations must be specified in a `.env` file located in the `/deploy/service` directory. This file should follow the `Section__Property` syntax to correctly map to the application's configuration.
 
-Refer to `env-example.txt` for a template of the required variables.
+Refer to `env-example.txt` for a template of the required secret variables.
 
-| Variable                                             | appsettings Mapping                                 | Description             |
-| :--------------------------------------------------- | :-------------------------------------------------- | :---------------------- |
-| `RecognitionOptions__VlmApiKey`                      | `RecognitionOptions.VlmApiKey`                      | Gemini/VLM API Key      |
-| `TireDbMatchingOptions__TireCodeEndpointUri`         | `TireDbMatchingOptions.TireCodeEndpointUri`         | URI for tire code DB    |
-| `TireDbMatchingOptions__TireManufacturerEndpointUri` | `TireDbMatchingOptions.TireManufacturerEndpointUri` | URI for manufacturer DB |
+| Variable                                             | appsettings Mapping                                 | Description                              |
+| :--------------------------------------------------- | :-------------------------------------------------- | :--------------------------------------- |
+| `RecognitionOptions__VlmApiKey`                      | `RecognitionOptions.VlmApiKey`                      | Gemini/VLM API Key                       |
+| `RecognitionOptions__VlmPrompt`                      | `RecognitionOptions.VlmPrompt`                      | Gemini/VLM prompt to use for recognition |
+| `TireDbMatchingOptions__TireCodeEndpointUri`         | `TireDbMatchingOptions.TireCodeEndpointUri`         | URI for tire code DB                     |
+| `TireDbMatchingOptions__TireManufacturerEndpointUri` | `TireDbMatchingOptions.TireManufacturerEndpointUri` | URI for manufacturer DB                  |
 
 ##### Execution
 
@@ -127,10 +127,11 @@ dotnet run --project src/TireRecognition.WebApi/TireRecognition.WebApi.csproj
 
 ##### Essential Variables
 
-The default configuration variables are the same as for the Docker deployment. Defaults are located in `appsettings.json` with invalid placeholder values for secrets. Required secrets should be provided via environment variables or dotnet user secrets.
+The default configuration variables are the same as for the Docker deployment. Defaults are located in `appsettings.json` with invalid placeholder values for required secrets. Required secrets should be provided via environment variables.
 
-| Variable                                             | appsettings Mapping                                 | Description             |
-| :--------------------------------------------------- | :-------------------------------------------------- | :---------------------- |
-| `RecognitionOptions__VlmApiKey`                      | `RecognitionOptions.VlmApiKey`                      | Gemini/VLM API Key      |
-| `TireDbMatchingOptions__TireCodeEndpointUri`         | `TireDbMatchingOptions.TireCodeEndpointUri`         | URI for tire code DB    |
-| `TireDbMatchingOptions__TireManufacturerEndpointUri` | `TireDbMatchingOptions.TireManufacturerEndpointUri` | URI for manufacturer DB |
+| Variable                                             | appsettings Mapping                                 | Description                              |
+| :--------------------------------------------------- | :-------------------------------------------------- | :--------------------------------------- |
+| `RecognitionOptions__VlmApiKey`                      | `RecognitionOptions.VlmApiKey`                      | Gemini/VLM API Key                       |
+| `RecognitionOptions__VlmPrompt`                      | `RecognitionOptions.VlmPrompt`                      | Gemini/VLM prompt to use for recognition |
+| `TireDbMatchingOptions__TireCodeEndpointUri`         | `TireDbMatchingOptions.TireCodeEndpointUri`         | URI for tire code DB                     |
+| `TireDbMatchingOptions__TireManufacturerEndpointUri` | `TireDbMatchingOptions.TireManufacturerEndpointUri` | URI for manufacturer DB                  |
