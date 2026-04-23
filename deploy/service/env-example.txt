@@ -1,10 +1,8 @@
-OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-xyz.grafana.net/otlp
-OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic%1234567
+OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-xyz.grafana.net/otlp # not required
+OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic%1234567 # not required
 
-AuthOptions__ApiKey=arbitraryapikeyofmychoosing
-
+AuthOptions__ApiKey=arbitraryapikeyofmychoosing # not required
 RecognitionOptions__VlmApiKey=apikeytogemini123456
-RecognitionOptions__VlmPrompt=example prompt 123
 
-TireDbMatchingOptions__TireCodeEndpointUri=https://example-tire-codes-endpoint.com/xyz
-TireDbMatchingOptions__TireManufacturerEndpointUri=https://example-manufacturers-endpoint.com/xyz
+TireDbMatchingOptions__TireCodeEndpointUri=https://example-tire-codes-endpoint.com/xyz # only required for DbMatching functionality
+TireDbMatchingOptions__TireManufacturerEndpointUri=https://example-manufacturers-endpoint.com/xyz # only required for DbMatching functionality

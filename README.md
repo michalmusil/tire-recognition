@@ -21,6 +21,10 @@ The architecture of the service is based on the [Clean/Onion Architecture](https
 - **Resilience**: Implements built-in retry policies and circuit breakers for robust communication with external services.
 - **Observability**: Includes full OpenTelemetry (OTEL) integration for comprehensive tracing and logging.
 
+#### Additional Feature: Manufacturer Extraction
+
+The production service prototype includes functionality for extracting an additional parameter beyond the primary evaluated scenario: the tire manufacturer name. This feature was suggested by the retailer during later development stages of the thesis as a supplementary parameter not required for a successful recognition. Because incorporating this parameter into the formal evaluation would have required major modifications to established and already implemented portions of the thesis, it was excluded from the academic scope. In this prototype, the functionality is made available on a best-effort basis by a minor modification of the prompt, parsing logic and additional DbMatching. Re-evaluating this version of the prompt with the thesis-established dataset on the winning Gemini 2.5 F1 configuration revealed no degradation of tire code extraction ability in any of the evaluated metrics.
+
 ## API Documentation
 
 The service provides interactive documentation via **Swagger/OpenAPI**. When running in a local or development environment, the UI is accessible at:
@@ -40,14 +44,15 @@ The service is containerized and pre-built image targetting the x86_64 architect
 - Docker
 - Sensitive configurations must be defined in a `.env` file within the `/deploy/service` directory. Refer to `env-example.txt` for a template. Following secrets must be specified:
 
-| Variable                                             | AppSettings / User Secrets Mapping                  | Description              |
-| :--------------------------------------------------- | :-------------------------------------------------- | :----------------------- |
-| `RecognitionOptions__VlmApiKey`                      | `RecognitionOptions:VlmApiKey`                      | Gemini/VLM API Key.      |
-| `RecognitionOptions__VlmPrompt`                      | `RecognitionOptions:VlmPrompt`                      | VLM recognition prompt.  |
-| `TireDbMatchingOptions__TireCodeEndpointUri`         | `TireDbMatchingOptions:TireCodeEndpointUri`         | URI for tire code DB.    |
-| `TireDbMatchingOptions__TireManufacturerEndpointUri` | `TireDbMatchingOptions:TireManufacturerEndpointUri` | URI for manufacturer DB. |
+| Variable                                             | AppSettings / User Secrets Mapping                  | Description                |
+| :--------------------------------------------------- | :-------------------------------------------------- | :------------------------- |
+| `RecognitionOptions__VlmApiKey`                      | `RecognitionOptions:VlmApiKey`                      | Gemini API Key.            |
+| `TireDbMatchingOptions__TireCodeEndpointUri`         | `TireDbMatchingOptions:TireCodeEndpointUri`         | \*URI for tire code DB.    |
+| `TireDbMatchingOptions__TireManufacturerEndpointUri` | `TireDbMatchingOptions:TireManufacturerEndpointUri` | \*URI for manufacturer DB. |
 
-#### Building and Publishing the Image
+_\* only required for DbMatching functionality_
+
+#### Building and Publishing the Image (not required)
 
 Execute the `build.sh` script to build the Docker image of the service (defined in `src/TireRecognition.WebApi/Dockerfile`). The image name and tag can be customized within the script variables.
 
