@@ -1,6 +1,6 @@
 # Tire Recognition API
 
-This archive contains the implementation of the **production service prototype** service described in the thesis: "Evaluation and Application of Contemporary Text Recognition Solutions for Tire Parameter Extraction".
+This archive contains the implementation of the **production service prototype** described in the thesis: "Evaluation and Application of Contemporary Text Recognition Solutions for Tire Parameter Extraction".
 
 Tire Recognition is a .NET 10 Web API service designed for automated tire sidewall parameter extraction via text recognition from images. The system integrates computer vision for preprocessing, vision language models (VLMs) for text recognition (TR), regex-based logic for postprocessing, and string similarity matching against database entries for end-user validation.
 
@@ -44,11 +44,11 @@ The service is containerized and pre-built image targetting the x86_64 architect
 - Docker
 - Sensitive configurations must be defined in a `.env` file within the `/deploy/service` directory. Refer to `env-example.txt` for a template. Following secrets must be specified:
 
-| Variable                                             | AppSettings / User Secrets Mapping                  | Description                |
-| :--------------------------------------------------- | :-------------------------------------------------- | :------------------------- |
-| `RecognitionOptions__VlmApiKey`                      | `RecognitionOptions:VlmApiKey`                      | Gemini API Key.            |
-| `TireDbMatchingOptions__TireCodeEndpointUri`         | `TireDbMatchingOptions:TireCodeEndpointUri`         | \*URI for tire code DB.    |
-| `TireDbMatchingOptions__TireManufacturerEndpointUri` | `TireDbMatchingOptions:TireManufacturerEndpointUri` | \*URI for manufacturer DB. |
+| Variable                                               | AppSettings / User Secrets Mapping                  | Description                |
+| :----------------------------------------------------- | :-------------------------------------------------- | :------------------------- |
+| `RecognitionOptions__VlmApiKey`                        | `RecognitionOptions:VlmApiKey`                      | Gemini API Key.            |
+| \*`TireDbMatchingOptions__TireCodeEndpointUri`         | `TireDbMatchingOptions:TireCodeEndpointUri`         | \*URI for tire code DB.    |
+| \*`TireDbMatchingOptions__TireManufacturerEndpointUri` | `TireDbMatchingOptions:TireManufacturerEndpointUri` | \*URI for manufacturer DB. |
 
 _\* only required for DbMatching functionality_
 

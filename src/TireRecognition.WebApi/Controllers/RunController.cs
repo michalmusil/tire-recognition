@@ -33,17 +33,17 @@ public class RunController : ControllerBase
     ///
     /// ### Expected inputs
     /// * [required] A tire photo with aforementioned qualities in one of following formats: [jpg, jpeg, png, webp]
-    /// * [optional] A limit on how many matches should get compared with the extracted tire code during db matching. If not specified, default from configuration is used
+    /// * [optional] A limit on how many top matches should be returned with the extracted tire code after db matching. If not specified, the default from configuration is used
     /// 
     /// ### Extracted parameters
     /// * Width - width of the tire in millimeters
     /// * Aspect ratio - aspect ratio of the sidewall height to the tire width
     /// * Construction - 1 letter indicating the construction type of the tire
     /// * Diameter - diameter of the tire in inches (rarely in millimeters)
-    /// * Load range - a single letter indicating tire ply rating (only rarely present, only on light truck tires)
+    /// * Load range - a single letter indicating tire ply rating (only on light truck tires)
     /// * Load index - a whole number, indicates load index of a passenger car tire, or single-mounting load index for light truck tire
     /// * Load index 2 - a whole number, only present in light truck tires - indicates dual-mounting load index 
-    /// * Speed rating - 1 letter (sometimes with an additional number) indicating the speed rating of the tire
+    /// * Speed rating - 1 letter indicating the speed rating of the tire
     ///
     /// ### Request format
     /// A multipart/form-data request is expected with the following parts:
